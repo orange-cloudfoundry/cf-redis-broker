@@ -11,10 +11,10 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("Next available TCP port", func() {
+var _ = Describe("Find the first Free TCP port in the range", func() {
 
-	It("finds a free TCP port", func() {
-		port, _ := system.FindFreePort()
+	It("finds a the  free TCP port in the range ", func() {
+		port, _ := system.FindFreeInRangePort(40005,40000)
 		portStr := strconv.Itoa(port)
 
 		matched, err := regexp.MatchString("^[0-9]+$", portStr)
