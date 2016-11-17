@@ -35,9 +35,7 @@ type ServiceConfiguration struct {
 	InstanceDataDirectory       string    `yaml:"data_directory"`
 	InstanceLogDirectory        string    `yaml:"log_directory"`
 	ServiceInstanceLimit        int       `yaml:"service_instance_limit"`
-	Dedicated                   Dedicated `yaml:"dedicated"`
-        
-// tester les ports
+	Dedicated                   Dedicated `yaml:"dedicated"`     
         SharedMaxPort                     int       `yaml:"shared_max_port"`
         SharedMinPort                     int       `yaml:"shared_min_port"`
 }

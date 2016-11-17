@@ -47,11 +47,10 @@ func (localInstanceCreator *LocalInstanceCreator) Create(instanceID string) erro
 	}
 	SharedMaxPort := localInstanceCreator.RedisConfiguration.SharedMaxPort
         SharedMinPort := localInstanceCreator.RedisConfiguration.SharedMinPort
-	//port, _ := localInstanceCreator.FindFreePort()
-	portInRange, _ := localInstanceCreator.FindFreeInRangePort(SharedMaxPort, SharedMinPort)
+	port, _ := localInstanceCreator.FindFreeInRangePort(SharedMaxPort, SharedMinPort)
 	instance := &Instance{
 		ID:       instanceID,
-		Port:     portInRange,
+		Port:     port,
 		Host:     localInstanceCreator.RedisConfiguration.Host,
 		Password: uuid.NewRandom().String(),
 	}
