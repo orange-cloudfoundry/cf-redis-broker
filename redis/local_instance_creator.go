@@ -1,10 +1,9 @@
 package redis
 
 import (
-	"errors"
 	"time"
 
-	"github.com/pborman/uuid"
+	"code.google.com/p/go-uuid/uuid"
 
 	"github.com/pivotal-cf/brokerapi"
 	"github.com/pivotal-cf/cf-redis-broker/brokerconfig"
@@ -24,29 +23,31 @@ type LocalInstanceRepository interface {
 	InstanceConfigPath(instanceID string) string
 	InstanceLogFilePath(instanceID string) string
 	InstancePidFilePath(instanceID string) string
-	InstanceCount() (int, []error)
+	InstanceCount() (int, error)
 	Lock(instance *Instance) error
 	Unlock(instance *Instance) error
 }
 
 type LocalInstanceCreator struct {
 	LocalInstanceRepository
-	FindFreePort       func() (int, error)
+	FindFreePort       func(int) (int, error)
 	ProcessController  ProcessController
 	RedisConfiguration brokerconfig.ServiceConfiguration
+	FindFreeInRangePort  func(int, int) (int, error)
 }
 
 func (localInstanceCreator *LocalInstanceCreator) Create(instanceID string) error {
-	instanceCount, errs := localInstanceCreator.InstanceCount()
-	if len(errs) > 0 {
-		return errors.New("Failed to determine current instance count, view broker logs for details")
+	instanceCount, err := localInstanceCreator.InstanceCount()
+	if err != nil {
+		return err
 	}
 
 	if instanceCount >= localInstanceCreator.RedisConfiguration.ServiceInstanceLimit {
 		return brokerapi.ErrInstanceLimitMet
 	}
-
-	port, _ := localInstanceCreator.FindFreePort()
+	SharedMaxPort := localInstanceCreator.RedisConfiguration.SharedMaxPort
+        SharedMinPort := localInstanceCreator.RedisConfiguration.SharedMinPort
+	port, _ := localInstanceCreator.FindFreeInRangePort(SharedMaxPort, SharedMinPort)
 	instance := &Instance{
 		ID:       instanceID,
 		Port:     port,
@@ -54,7 +55,7 @@ func (localInstanceCreator *LocalInstanceCreator) Create(instanceID string) erro
 		Password: uuid.NewRandom().String(),
 	}
 
-	err := localInstanceCreator.Setup(instance)
+	err = localInstanceCreator.Setup(instance)
 	if err != nil {
 		return err
 	}
@@ -100,3 +101,4 @@ func (localInstanceCreator *LocalInstanceCreator) startLocalInstance(instance *I
 	timeout := time.Duration(localInstanceCreator.RedisConfiguration.StartRedisTimeoutSeconds) * time.Second
 	return localInstanceCreator.ProcessController.StartAndWaitUntilReady(instance, configPath, instanceDataDir, pidfilePath, logfilePath, timeout)
 }
+

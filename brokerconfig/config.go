@@ -9,14 +9,13 @@ import (
 )
 
 type Config struct {
-	RedisConfiguration              ServiceConfiguration `yaml:"redis"`
-	AuthConfiguration               AuthConfiguration    `yaml:"auth"`
-	Host                            string               `yaml:"backend_host"`
-	Port                            string               `yaml:"backend_port"`
-	MonitExecutablePath             string               `yaml:"monit_executable_path"`
-	RedisServerExecutablePath       string               `yaml:"redis_server_executable_path"`
-	AgentPort                       string               `yaml:"agent_port"`
-	ConsistencyVerificationInterval int                  `yaml:"consistency_check_interval_seconds"`
+	RedisConfiguration        ServiceConfiguration `yaml:"redis"`
+	AuthConfiguration         AuthConfiguration    `yaml:"auth"`
+	Host                      string               `yaml:"backend_host"`
+	Port                      string               `yaml:"backend_port"`
+	MonitExecutablePath       string               `yaml:"monit_executable_path"`
+	RedisServerExecutablePath string               `yaml:"redis_server_executable_path"`
+	AgentPort                 string               `yaml:"agent_port"`
 }
 
 type AuthConfiguration struct {
@@ -34,18 +33,13 @@ type ServiceConfiguration struct {
 	ProcessCheckIntervalSeconds int       `yaml:"process_check_interval"`
 	StartRedisTimeoutSeconds    int       `yaml:"start_redis_timeout"`
 	InstanceDataDirectory       string    `yaml:"data_directory"`
-	PidfileDirectory            string    `yaml:"pidfile_directory"`
 	InstanceLogDirectory        string    `yaml:"log_directory"`
 	ServiceInstanceLimit        int       `yaml:"service_instance_limit"`
-	Dedicated                   Dedicated `yaml:"dedicated"`
-	Description                 string    `yaml:"description"`
-	LongDescription             string    `yaml:"long_description"`
-	ProviderDisplayName         string    `yaml:"provider_display_name"`
-	DocumentationURL            string    `yaml:"documentation_url"`
-	SupportURL                  string    `yaml:"support_url"`
-	DisplayName                 string    `yaml:"display_name"`
-	IconImage                   string    `yaml:"icon_image"`
+	Dedicated                   Dedicated `yaml:"dedicated"`     
+        SharedMaxPort                     int       `yaml:"shared_max_port"`
+        SharedMinPort                     int       `yaml:"shared_min_port"`
 }
+
 
 type Dedicated struct {
 	Nodes         []string `yaml:"nodes"`
