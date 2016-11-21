@@ -45,6 +45,10 @@ type ServiceConfiguration struct {
 	SupportURL                  string    `yaml:"support_url"`
 	DisplayName                 string    `yaml:"display_name"`
 	IconImage                   string    `yaml:"icon_image"`
+        SharedMaxPort               int       `yaml:"shared_max_port"`
+        SharedMinPort               int       `yaml:"shared_min_port"`
+
+
 }
 
 type Dedicated struct {

@@ -31,9 +31,10 @@ type LocalInstanceRepository interface {
 
 type LocalInstanceCreator struct {
 	LocalInstanceRepository
-	FindFreePort       func() (int, error)
+	FindFreePort       func(int) (int, error)
 	ProcessController  ProcessController
 	RedisConfiguration brokerconfig.ServiceConfiguration
+        FindFreeInRangePort  func(int, int) (int, error)
 }
 
 func (localInstanceCreator *LocalInstanceCreator) Create(instanceID string) error {
@@ -45,8 +46,12 @@ func (localInstanceCreator *LocalInstanceCreator) Create(instanceID string) erro
 	if instanceCount >= localInstanceCreator.RedisConfiguration.ServiceInstanceLimit {
 		return brokerapi.ErrInstanceLimitMet
 	}
-
-	port, _ := localInstanceCreator.FindFreePort()
+	SharedMaxPort := localInstanceCreator.RedisConfiguration.SharedMaxPort
+        SharedMinPort := localInstanceCreator.RedisConfiguration.SharedMinPort
+        port, err := localInstanceCreator.FindFreeInRangePort(SharedMaxPort, SharedMinPort)
+        if err != nil {
+                return err
+        }
 	instance := &Instance{
 		ID:       instanceID,
 		Port:     port,
