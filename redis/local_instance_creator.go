@@ -31,7 +31,6 @@ type LocalInstanceRepository interface {
 
 type LocalInstanceCreator struct {
 	LocalInstanceRepository
-	FindFreePort       func(int) (int, error)
 	ProcessController  ProcessController
 	RedisConfiguration brokerconfig.ServiceConfiguration
         FindFreeInRangePort  func(int, int) (int, error)
@@ -48,7 +47,7 @@ func (localInstanceCreator *LocalInstanceCreator) Create(instanceID string) erro
 	}
 	SharedMaxPort := localInstanceCreator.RedisConfiguration.SharedMaxPort
         SharedMinPort := localInstanceCreator.RedisConfiguration.SharedMinPort
-        port, err := localInstanceCreator.FindFreeInRangePort(SharedMaxPort, SharedMinPort)
+        port, err := localInstanceCreator.FindFreeInRangePort(SharedMinPort, SharedMaxPort)
         if err != nil {
                 return err
         }

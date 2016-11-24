@@ -18,14 +18,16 @@ func FindFreePort(num int) (int, error) {
 }
 
 
-func FindFreeInRangePort(Maxport int, Minport int)(int,error) {
+func FindFreeInRangePort(Minport int, Maxport int)(int,error) {
+	if(Minport > Maxport) || (Minport < 1024) || (Maxport > 65535){ 
+        return -1, errors.New("Sorry No Free port in this range is available")
+        }
         i := Minport
         port, err :=FindFreePort(i)
         for (err != nil) && (i<Maxport) {
         i=i+1
         port, err =FindFreePort(i)
         }
-
         if (err != nil) {
         return -1, errors.New("Sorry No Free port in this range is available")
         }

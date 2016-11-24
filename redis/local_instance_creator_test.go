@@ -16,7 +16,7 @@ import (
 
 var freePortsFound int
 
-func fakeFindFreeInRangePortfinder(int, int) (int, error) {
+func fakeFindFreeInRangePortfinder(min ,max int) (int, error) {
 
 	freePortsFound++
 	return 8080, nil
@@ -36,7 +36,7 @@ var _ = Describe("Local Redis Creator", func() {
 		fakeLocalRepository = new(fakes.FakeLocalRepository)
 
 		localInstanceCreator = &redis.LocalInstanceCreator{
-			FindFreePort:            fakeFindFreeInRangePortfinder,
+			FindFreeInRangePort:     fakeFindFreeInRangePortfinder,
 			ProcessController:       fakeProcessController,
 			LocalInstanceRepository: fakeLocalRepository,
 			RedisConfiguration: brokerconfig.ServiceConfiguration{
