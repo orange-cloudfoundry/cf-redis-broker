@@ -59,7 +59,7 @@ func (localInstanceCreator *LocalInstanceCreator) Create(instanceID string) erro
 		Password: uuid.NewRandom().String(),
 	}
 
-	err := localInstanceCreator.Setup(instance)
+	err = localInstanceCreator.Setup(instance)
 	if err != nil {
 		return err
 	}
