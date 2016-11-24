@@ -1,34 +1,57 @@
 package system_test
 
 import (
-        "net"
-        "regexp"
-        "strconv"
+	. "github.com/pivotal-cf/cf-redis-broker/system"
 
-        "github.com/pivotal-cf/cf-redis-broker/system"
-
-        . "github.com/onsi/ginkgo"
-        . "github.com/onsi/gomega"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("Next available TCP port", func() {
+var _ = Describe("Find next available TCP port in a range", func() {
+	var freeTcpPort FreeTcpPort
+	BeforeEach(func() {
+		freeTcpPort = NewFreeTcpPort()
+	})
+	Context("with a valid range", func() {
+		It("should give a free port", func() {
+			port, err := freeTcpPort.FindFreePortInRange(40000, 40005)
+			Expect(err).ShouldNot(HaveOccurred())
 
-        It("finds a the  free TCP port in the range ", func() {
-                port, _ := system.FindFreeInRangePort(40005,40000)
-                portStr := strconv.Itoa(port)
-
-                matched, err := regexp.MatchString("^[0-9]+$", portStr)
-                Ω(matched).To(Equal(true))
-
-                l, err := net.Listen("tcp", ":"+portStr)
-                Ω(err).ToNot(HaveOccurred())
-                l.Close()
-        })
-        It("test the case when no port available in the range ", func() {
-                _, err := system.FindFreeInRangePort(-1,-1)
-                Ω(err).To(HaveOccurred())
-                Ω(err).err.String().Should(ContainSubstring("No Free port"))                
-        })
+			Expect(err).ShouldNot(HaveOccurred())
+			Expect(port).To(BeNumerically(">=", 40000))
+			Expect(port).To(BeNumerically("<=", 40005))
+		})
+	})
+	Context("with an invalid range port", func() {
+		It("should return an error if minimum port is greater than maximum port", func() {
+			_, err := freeTcpPort.FindFreePortInRange(6000, 5000)
+			Expect(err).Should(HaveOccurred())
+			Expect(err.Error()).To(ContainSubstring("minimum port is higher than maximum port"))
+		})
+		It("should return an error if minimum port is lower than accepted minimum port", func() {
+			_, err := freeTcpPort.FindFreePortInRange(MIN_ACCEPTED_PORT - 1, 5000)
+			Expect(err).Should(HaveOccurred())
+			Expect(err.Error()).To(ContainSubstring("minimum port is lower than"))
+		})
+		It("should return an error if maximum port is lower than accepted maximum port", func() {
+			_, err := freeTcpPort.FindFreePortInRange(4000, MAX_ACCEPTED_PORT + 1)
+			Expect(err).Should(HaveOccurred())
+			Expect(err.Error()).To(ContainSubstring("maximum port is higher than"))
+		})
+	})
+	Context("When no port is available in range", func() {
+		BeforeEach(func() {
+			freeTcpPort = NewFreeTcpPort()
+			freeTcpPort.(*FreeRangeTcpPort).IsPortAvailable = func(num int) bool {
+				return false
+			}
+		})
+		It("Should return an error", func() {
+			_, err := freeTcpPort.FindFreePortInRange(40000, 40005)
+			Expect(err).Should(HaveOccurred())
+			Expect(err.Error()).To(ContainSubstring("no port is available in this range"))
+		})
+	})
 
 })
 

@@ -8,6 +8,7 @@ import (
 
 	"github.com/pivotal-cf/brokerapi"
 	"github.com/pivotal-cf/cf-redis-broker/brokerconfig"
+	"github.com/pivotal-cf/cf-redis-broker/system"
 )
 
 type ProcessController interface {
@@ -31,9 +32,9 @@ type LocalInstanceRepository interface {
 
 type LocalInstanceCreator struct {
 	LocalInstanceRepository
+	FreeTcpPort        system.FreeTcpPort
 	ProcessController  ProcessController
 	RedisConfiguration brokerconfig.ServiceConfiguration
-        FindFreeInRangePort  func(int, int) (int, error)
 }
 
 func (localInstanceCreator *LocalInstanceCreator) Create(instanceID string) error {
@@ -46,11 +47,11 @@ func (localInstanceCreator *LocalInstanceCreator) Create(instanceID string) erro
 		return brokerapi.ErrInstanceLimitMet
 	}
 	SharedMaxPort := localInstanceCreator.RedisConfiguration.SharedMaxPort
-        SharedMinPort := localInstanceCreator.RedisConfiguration.SharedMinPort
-        port, err := localInstanceCreator.FindFreeInRangePort(SharedMinPort, SharedMaxPort)
-        if err != nil {
-                return err
-        }
+	SharedMinPort := localInstanceCreator.RedisConfiguration.SharedMinPort
+	port, err := localInstanceCreator.FreeTcpPort.FindFreePortInRange(SharedMinPort, SharedMaxPort)
+	if err != nil {
+		return err
+	}
 	instance := &Instance{
 		ID:       instanceID,
 		Port:     port,
