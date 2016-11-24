@@ -24,6 +24,11 @@ var _ = Describe("Next available TCP port", func() {
                 Ω(err).ToNot(HaveOccurred())
                 l.Close()
         })
+        It("test the case when no port available in the range ", func() {
+                _, err := system.FindFreeInRangePort(-1,-1)
+                Ω(err).To(HaveOccurred())
+                Ω(err).err.String()).Should(ContainSubstring("No Free port"))                
+        })
 
 })
 

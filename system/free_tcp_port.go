@@ -8,8 +8,8 @@ import (
 
 func FindFreePort(num int) (int, error) {
         t := strconv.Itoa(num)
-        toto := ":" + t
-        l, err := net.Listen("tcp", toto)
+        a := ":" + t
+        l, err := net.Listen("tcp",a)
         if err != nil {
                 return -1, err
         }
@@ -27,7 +27,7 @@ func FindFreeInRangePort(Maxport int, Minport int)(int,error) {
         }
 
         if (err != nil) {
-        return -1, errors.New("Sorry No Free port in this range  is availble")
+        return -1, errors.New("Sorry No Free port in this range is available")
         }
         return port, err
 }
