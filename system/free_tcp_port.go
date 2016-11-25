@@ -31,15 +31,6 @@ func isPortAvailable(num int) bool {
 	return true
 }
 func (f FreeRangeTcpPort) FindFreePortInRange(minport int, maxport int) (int, error) {
-	if minport > maxport {
-		return -1, errors.New("Not valid range port: minimum port is higher than maximum port")
-	}
-	if minport < MIN_ACCEPTED_PORT {
-		return -1, errors.New("Not valid range port: minimum port is lower than " + strconv.Itoa(MIN_ACCEPTED_PORT))
-	}
-	if maxport > MAX_ACCEPTED_PORT {
-		return -1, errors.New("Not valid range port: maximum port is higher than " + strconv.Itoa(MIN_ACCEPTED_PORT))
-	}
 	port := minport
 	for port <= maxport {
 		if f.IsPortAvailable(port) {

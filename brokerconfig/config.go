@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/cloudfoundry-incubator/candiedyaml"
+	"github.com/pivotal-cf/cf-redis-broker/system"
 )
 
 type Config struct {
@@ -95,9 +96,28 @@ func ValidateConfig(config ServiceConfiguration) error {
 		return err
 	}
 
+	err = checkPortRange(config.SharedMinPort, config.SharedMaxPort)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
-
+func checkPortRange(sharedMinPort, sharedMaxPort int) error {
+	if sharedMinPort > sharedMaxPort {
+		return errors.New("Not valid range port: minimum port is higher than maximum port")
+	}
+	if sharedMinPort < system.MIN_ACCEPTED_PORT {
+		return errors.New(fmt.Sprintf("Not valid range port: minimum port is lower than %d", system.MIN_ACCEPTED_PORT))
+	}
+	if sharedMinPort > system.MAX_ACCEPTED_PORT {
+		return errors.New(fmt.Sprintf("Not valid range port: minimum port is higher than %d", system.MAX_ACCEPTED_PORT))
+	}
+	if sharedMaxPort > system.MAX_ACCEPTED_PORT {
+		return errors.New(fmt.Sprintf("Not valid range port: maximum port is higher than %d", system.MAX_ACCEPTED_PORT))
+	}
+	return nil
+}
 func checkPathExists(path string, description string) error {
 	_, err := os.Stat(path)
 	if err != nil {

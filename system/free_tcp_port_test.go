@@ -34,23 +34,6 @@ var _ = Describe("Find next available TCP port in a range", func() {
 			Expect(port).To(BeEquivalentTo(65000))
 		})
 	})
-	Context("with an invalid range port", func() {
-		It("should return an error if minimum port is greater than maximum port", func() {
-			_, err := freeTcpPort.FindFreePortInRange(6000, 5000)
-			Expect(err).Should(HaveOccurred())
-			Expect(err.Error()).To(ContainSubstring("minimum port is higher than maximum port"))
-		})
-		It("should return an error if minimum port is lower than accepted minimum port", func() {
-			_, err := freeTcpPort.FindFreePortInRange(MIN_ACCEPTED_PORT - 1, 5000)
-			Expect(err).Should(HaveOccurred())
-			Expect(err.Error()).To(ContainSubstring("minimum port is lower than"))
-		})
-		It("should return an error if maximum port is lower than accepted maximum port", func() {
-			_, err := freeTcpPort.FindFreePortInRange(4000, MAX_ACCEPTED_PORT + 1)
-			Expect(err).Should(HaveOccurred())
-			Expect(err.Error()).To(ContainSubstring("maximum port is higher than"))
-		})
-	})
 	Context("When no port is available in range", func() {
 		BeforeEach(func() {
 			freeTcpPort = NewFreeTcpPort()
